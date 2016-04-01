@@ -5,36 +5,40 @@ OPT = yes
 FFLAGS = -O3
 FFLAG2 =
 
-FORTRAN = mpif90
-#FORTRAN = ifort
-#FORTRAN = gfortran
-#FORTRAN = bg-gfortran
+#FC = mpif90
+#FC = ifort
+#FC = gfortran
+#FC = bg-gfortran
+FC =  /opt/mpich/dev/intel/default/bin/mpifort
+FORTRAN = INTEL
 
-#ifeq ($(FORTRAN),ifort)
-ifeq ($(FORTRAN),mpif90)
+FC =  /opt/mpich/dev/gcc/default/bin/mpifort
+FORTRAN = GNU
+
+ifeq ($(FORTRAN),INTEL)
   TARGET = snap
-  FFLAGS = -O3 -openmp
+  FFLAGS = -O3 -qopenmp
   FFLAG2 =
   ifeq ($(OPT),no)
     TARGET = snap_db
-    FFLAGS = -g -O0 -check bounds -traceback -openmp
+    FFLAGS = -g -O0 -check bounds -traceback -qopenmp
     FFLAG2 =
   endif
 endif
 
-#ifeq ($(FORTRAN),gfortran)
-#  TARGET = snapg
-#  FFLAGS = -O3
-#  FFLAG2 =
-#  ifeq ($(OPT),no)
-#    TARGET = snapg_db
-#    FFLAGS = -g -O0 -fbounds-check
-#    FFLAG2 = -fbacktrace
-#  endif
-#endif
+ifeq ($(FORTRAN),GNU)
+  TARGET = snapg
+  FFLAGS = -O3 -fopenmp
+  FFLAG2 =
+  ifeq ($(OPT),no)
+    TARGET = snapg_db
+    FFLAGS = -g -O0 -fbounds-check -fopenmp
+    FFLAG2 = -fbacktrace
+  endif
+endif
 
 #RDIST = no
-#ifeq ($(FORTRAN),bf-gfortran)
+#ifeq ($(FC),bf-gfortran)
 #  TARGET = snap_byfl
 #  FFLAGS = -O3 -bf-all-ops -bf-by-func
 #  FFLAG2 =
@@ -63,7 +67,7 @@ SRCS = global.f90 snap_main.f90 utils.f90 version.f90 plib.f90 geom.f90 \
        octsweep.f90 dim1_sweep.f90 dim3_sweep.f90 output.f90 time.f90 mms.f90
 
 $(TARGET) :	$(OBJS)
-		$(FORTRAN) $(FFLAGS) $(FFLAG2) -o $@ $(OBJS)
+		$(FC) $(FFLAGS) $(FFLAG2) -o $@ $(OBJS)
 
 snap_main.o :	global.o utils.o version.o input.o setup.o output.o time.o \
 		dealloc.o plib.o control.o
@@ -100,7 +104,7 @@ mms.o:	global.o geom.o sn.o data.o control.o plib.o
 # Fortran rule
 #
 %.o:	%.f90
-	$(FORTRAN) $(FFLAGS) -c $<
+	$(FC) $(FFLAGS) -c $<
 
 #
 # Cleanup
@@ -121,6 +125,6 @@ count:
 # Link compiled files only. No recompile.
 #
 link:
-	$(FORTRAN) $(FFLAGS) $(FFLAG2) -o $(TARGET) $(OBJS)
+	$(FC) $(FFLAGS) $(FFLAG2) -o $(TARGET) $(OBJS)
 
 
