@@ -47,7 +47,7 @@ MODULE utils_module
 !   Declaration potentially needed for Cray. Seems harmless for others.
 !_______________________________________________________________________
 
-    INTEGER, EXTERNAL :: IARGC
+!JEFF    INTEGER, EXTERNAL :: IARGC
 !_______________________________________________________________________
 !
 !   Return if not root. Loop over the first two command line arguments
@@ -59,7 +59,8 @@ MODULE utils_module
 
     IF ( iproc /= root ) RETURN
 
-    IF ( IARGC() < 2 ) THEN
+!    IF ( IARGC() < 2 ) THEN
+    IF ( COMMAND_ARGUMENT_COUNT() < 2 ) THEN
       ierr = 1
       error = '***ERROR: CMDARG: Missing command line entry'
       RETURN
